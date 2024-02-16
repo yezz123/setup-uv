@@ -31875,7 +31875,7 @@ async function findUv(inputs) {
     const uvInstallPath = await (0, tool_cache_1.downloadTool)(installScript);
     // Run uv installation script
     if (os_1.default.platform() === 'win32') {
-        await (0, exec_1.exec)('powershell', [uvInstallPath]);
+        await (0, exec_1.exec)('powershell', [`irm ${installScript} | iex`]);
     }
     else {
         await (0, exec_1.exec)('sh', [uvInstallPath]);

@@ -1,0 +1,53 @@
+name: default
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  # run linters and unit tests
+  lint-and-test-units:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
+
+  # run action on a clean machine without building to check that it works as expected
+  test-integration:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+        uv-version:
+          - "0.1.2"
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: ./
+        with:
+          uv-version: ${{ matrix.uv-version }}
+      - run: uv --version

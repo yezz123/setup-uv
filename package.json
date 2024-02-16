@@ -1,21 +1,24 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
+  "name": "setup-uv",
+  "description": "Set up your GitHub Actions workflow with a specific version of uv",
   "version": "0.0.0",
-  "author": "",
-  "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "author": "Yasser Tahiri",
+  "private": false,
+  "homepage": "https://github.com/yezz123/setup-uv",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/yezz123/setup-uv.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/yezz123/setup-uv/issues"
   },
   "keywords": [
     "actions",
     "node",
-    "setup"
+    "setup",
+    "uv",
+    "ruff",
+    "astral"
   ],
   "exports": {
     ".": "./dist/index.js"
@@ -30,7 +33,7 @@
     "format:write": "prettier --write **/*.ts",
     "format:check": "prettier --check **/*.ts",
     "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
-    "package": "ncc build src/index.ts --license licenses.txt",
+    "package": "ncc build src/main.ts --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "jest",
     "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
@@ -66,7 +69,11 @@
     ]
   },
   "dependencies": {
-    "@actions/core": "^1.10.1"
+    "@actions/core": "^1.10.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/tool-cache": "^2.0.1",
+    "@types/semver": "^7.3.13",
+    "semver": "^7.3.8"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

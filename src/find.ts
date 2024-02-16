@@ -21,7 +21,7 @@ export async function findUv(inputs: Inputs): Promise<void> {
 
   // Run uv installation script
   if (os.platform() === 'win32') {
-    await exec('powershell', [uvInstallPath])
+    await exec('powershell', [`irm ${installScript} | iex`])
   } else {
     await exec('sh', [uvInstallPath])
   }

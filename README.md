@@ -34,7 +34,7 @@ steps:
   - uses: yezz123/setup-uv@v1
     with:
       uv-version: "0.1.2"
-  - run: poetry --version
+  - run: uv --version
 ```
 
 ### Allow to install prerelease versions of UV

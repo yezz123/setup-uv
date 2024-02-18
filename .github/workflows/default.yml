@@ -48,7 +48,6 @@ jobs:
       - uses: ./
         with:
           uv-version: ${{ matrix.uv-version }}
-          uv-venv: "my_virt_env"
       - run: uv --version
       - name: Get python executable
         if: runner.os == 'Windows'

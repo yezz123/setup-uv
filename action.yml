@@ -10,7 +10,7 @@ inputs:
     description: uv version to use, if version is not provided then latest stable version will be used
     required: false
   uv-venv:
-    description: uv venv name to create, if not provided then .venv will be used
+    description: uv venv name to create and activate, if not provided then .venv will be used
     required: false
     default: '.venv'
 runs:

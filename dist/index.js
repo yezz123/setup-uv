@@ -31972,7 +31972,7 @@ async function createVenv(venv) {
 exports.createVenv = createVenv;
 async function activateVenv(venv) {
     if (os_1.default.platform() === 'win32') {
-        await (0, exec_1.exec)('powershell', [`${venv}\\Scripts\\activate.ps1`]);
+        await (0, exec_1.exec)(`${venv}\\Scripts\\activate.ps1`);
     }
     else {
         await (0, exec_1.exec)('/bin/bash', ['-c', `source ${venv}/bin/activate`]);

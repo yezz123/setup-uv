@@ -9,6 +9,6 @@ export async function activateVenv(venv: string) {
   if (os.platform() === 'win32') {
     await exec('powershell', [`${venv}\\Scripts\\activate.ps1`])
   } else {
-    await exec('source', [`${venv}/bin/activate`])
+    await exec(`source ${venv}/bin/activate`)
   }
 }

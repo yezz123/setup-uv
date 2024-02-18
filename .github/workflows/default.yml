@@ -59,9 +59,4 @@ jobs:
         run: |
           which python
       - name: check inside virtual environment
-        run: |
-          echo $(python <<EOF
-          import sys
-          print('Yes' if sys.prefix != sys.base_prefix else 'No')
-          EOF
-          )
+        run: python -c "import sys; print('Yes' if sys.prefix != sys.base_prefix else 'No')"

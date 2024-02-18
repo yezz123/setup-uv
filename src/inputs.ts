@@ -1,16 +1,17 @@
 import { getInput } from '@actions/core'
 import semver from 'semver'
-
 export interface Inputs {
   // Finder related inputs
   preview: boolean
   version: string | null
+  venv: string | null
 }
 
 export function getInputs(): Inputs {
   return {
     preview: getBooleanInput('uv-preview'),
-    version: getVersionInput('uv-version')
+    version: getVersionInput('uv-version'),
+    venv: getVenvInput('uv-venv')
   }
 }
 
@@ -40,4 +41,12 @@ export function getVersionInput(name: string): string | null {
   }
 
   return version.trim()
+}
+
+export function getVenvInput(name: string, default_ = '.venv'): string {
+  const venv = getInput(name)
+  if (!venv) {
+    return default_
+  }
+  return venv.trim()
 }

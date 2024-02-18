@@ -9,6 +9,10 @@ inputs:
   uv-version:
     description: uv version to use, if version is not provided then latest stable version will be used
     required: false
+  uv-venv:
+    description: uv venv name to create, if not provided then .venv will be used
+    required: false
+    default: '.venv'
 runs:
   using: node20
   main: dist/index.js

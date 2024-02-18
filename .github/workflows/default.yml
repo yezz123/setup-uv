@@ -2,8 +2,6 @@ name: default
 on:
   pull_request:
   push:
-    branches:
-      - main
 
 jobs:
   # run linters and unit tests
@@ -50,4 +48,13 @@ jobs:
       - uses: ./
         with:
           uv-version: ${{ matrix.uv-version }}
+          uv-venv: "my_virt_env"
       - run: uv --version
+      - name: List files
+        if: runner.os == 'Windows'
+        run: |
+          Get-ChildItem -Force -Path my_virt_env
+      - name: List files
+        if: runner.os != 'Windows'
+        run: |
+          ls -la my_virt_env

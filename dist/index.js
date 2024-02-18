@@ -31974,7 +31974,7 @@ async function activateVenv(venv) {
         await (0, exec_1.exec)('powershell', [`${venv}\\Scripts\\activate.ps1`]);
     }
     else {
-        await (0, exec_1.exec)(`. ${venv}/bin/activate`);
+        await (0, exec_1.exec)('source', [`${venv}/bin/activate`]);
     }
 }
 exports.activateVenv = activateVenv;
@@ -33890,12 +33890,15 @@ const core_1 = __nccwpck_require__(2186);
 const find_1 = __nccwpck_require__(3288);
 const inputs_1 = __nccwpck_require__(7063);
 const venv_1 = __nccwpck_require__(667);
+const exec_1 = __nccwpck_require__(1514);
 async function run() {
     try {
         const inputs = (0, inputs_1.getInputs)();
         await (0, find_1.findUv)(inputs);
         if (inputs.venv) {
             await (0, venv_1.createVenv)(inputs.venv);
+            // Debugging only
+            await (0, exec_1.exec)(`ls -lR ${inputs.venv}`);
             await (0, venv_1.activateVenv)(inputs.venv);
         }
     }

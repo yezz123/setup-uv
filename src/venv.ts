@@ -1,4 +1,5 @@
 import { exec } from '@actions/exec'
+import { exportVariable, addPath } from '@actions/core'
 import os from 'os'
 
 export async function createVenv(venv: string) {
@@ -11,4 +12,6 @@ export async function activateVenv(venv: string) {
   } else {
     await exec('/bin/bash', ['-c', `source ${venv}/bin/activate`])
   }
+  exportVariable('VIRTUAL_ENV', venv)
+  addPath(`${venv}/bin`)
 }

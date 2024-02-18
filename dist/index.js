@@ -31964,6 +31964,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.activateVenv = exports.createVenv = void 0;
 const exec_1 = __nccwpck_require__(1514);
+const core_1 = __nccwpck_require__(2186);
 const os_1 = __importDefault(__nccwpck_require__(2037));
 async function createVenv(venv) {
     await (0, exec_1.exec)('uv', ['venv', venv]);
@@ -31976,6 +31977,8 @@ async function activateVenv(venv) {
     else {
         await (0, exec_1.exec)('/bin/bash', ['-c', `source ${venv}/bin/activate`]);
     }
+    (0, core_1.exportVariable)('VIRTUAL_ENV', venv);
+    (0, core_1.addPath)(`${venv}/bin`);
 }
 exports.activateVenv = activateVenv;
 

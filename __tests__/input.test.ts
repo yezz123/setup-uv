@@ -1,4 +1,10 @@
-import { getBooleanInput, getInputs, getVersionInput } from '../src/inputs'
+import { getInput } from '@actions/core'
+import {
+  getBooleanInput,
+  getInputs,
+  getVenvInput,
+  getVersionInput
+} from '../src/inputs'
 
 const TEST_ENV_VARS = {
   INPUT_MISSING: '',
@@ -9,7 +15,8 @@ const TEST_ENV_VARS = {
   INPUT_VERSION_ALPHA: '0.1.3.0a1',
 
   'INPUT_UV-PREVIEW': 'true',
-  'INPUT_UV-VERSION': '0.1.2'
+  'INPUT_UV-VERSION': '0.1.2',
+  'INPUT_UV-VENV': 'my_venv'
 }
 
 describe('options', () => {
@@ -42,7 +49,11 @@ describe('options', () => {
   })
 
   it('getInputs returns inputs', () => {
-    expect(getInputs()).toStrictEqual({ preview: true, version: '0.1.2' })
+    expect(getInputs()).toStrictEqual({
+      preview: true,
+      version: '0.1.2',
+      venv: 'my_venv'
+    })
   })
 
   it('getVersionInput throws if input is not valid', () => {
@@ -57,5 +68,13 @@ describe('options', () => {
 
   it('getVersionInput returns version if input is alpha', () => {
     expect(getVersionInput('version_alpha')).toBe('0.1.3.0a1')
+  })
+
+  it('getVenvInput returns venv name if input is valid', () => {
+    expect(getVenvInput('uv-venv')).toBe('my_venv')
+  })
+
+  it('getVenvInput returns .venv if input is not provided', () => {
+    expect(getVenvInput('SOMETHING')).toBe('.venv')
   })
 })

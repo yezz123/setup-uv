@@ -31973,12 +31973,13 @@ exports.createVenv = createVenv;
 async function activateVenv(venv) {
     if (os_1.default.platform() === 'win32') {
         await (0, exec_1.exec)(`${venv}/Scripts/activate.ps1`);
+        (0, core_1.addPath)(`${venv}/Scripts`);
     }
     else {
         await (0, exec_1.exec)('/bin/bash', ['-c', `source ${venv}/bin/activate`]);
+        (0, core_1.addPath)(`${venv}/bin`);
     }
     (0, core_1.exportVariable)('VIRTUAL_ENV', venv);
-    (0, core_1.addPath)(`${venv}/bin`);
 }
 exports.activateVenv = activateVenv;
 

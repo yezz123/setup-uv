@@ -9,9 +9,10 @@ export async function createVenv(venv: string) {
 export async function activateVenv(venv: string) {
   if (os.platform() === 'win32') {
     await exec(`${venv}/Scripts/activate.ps1`)
+    addPath(`${venv}/Scripts`)
   } else {
     await exec('/bin/bash', ['-c', `source ${venv}/bin/activate`])
+    addPath(`${venv}/bin`)
   }
   exportVariable('VIRTUAL_ENV', venv)
-  addPath(`${venv}/bin`)
 }

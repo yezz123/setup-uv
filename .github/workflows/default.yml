@@ -49,13 +49,13 @@ jobs:
         with:
           uv-version: ${{ matrix.uv-version }}
       - run: uv --version
-      - name: Get python executable
+      - name: Get python executable on Windows
         if: runner.os == 'Windows'
         run: |
           Get-Command python
-      - name: Get python executable
+      - name: Get python executable on non-Windows
         if: runner.os != 'Windows'
         run: |
           which python
-      - name: check inside virtual environment
-        run: python -c "import sys; print('Yes' if sys.prefix != sys.base_prefix else 'No')"
+      - name: Check inside virtual environment
+        run: python -c "import sys; exit(0 if sys.prefix != sys.base_prefix else 1)"

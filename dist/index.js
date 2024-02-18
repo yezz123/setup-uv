@@ -31906,13 +31906,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getVersionInput = exports.getBooleanInput = exports.getInputs = void 0;
+exports.getVenvInput = exports.getVersionInput = exports.getBooleanInput = exports.getInputs = void 0;
 const core_1 = __nccwpck_require__(2186);
 const semver_1 = __importDefault(__nccwpck_require__(1383));
 function getInputs() {
     return {
         preview: getBooleanInput('uv-preview'),
-        version: getVersionInput('uv-version')
+        version: getVersionInput('uv-version'),
+        venv: getVenvInput('uv-venv')
     };
 }
 exports.getInputs = getInputs;
@@ -31940,6 +31941,43 @@ function getVersionInput(name) {
     return version.trim();
 }
 exports.getVersionInput = getVersionInput;
+function getVenvInput(name, default_ = '.venv') {
+    const venv = (0, core_1.getInput)(name);
+    if (!venv) {
+        return default_;
+    }
+    return venv.trim();
+}
+exports.getVenvInput = getVenvInput;
+
+
+/***/ }),
+
+/***/ 667:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.activateVenv = exports.createVenv = void 0;
+const exec_1 = __nccwpck_require__(1514);
+const os_1 = __importDefault(__nccwpck_require__(2037));
+async function createVenv(venv) {
+    await (0, exec_1.exec)('uv', ['venv', venv]);
+}
+exports.createVenv = createVenv;
+async function activateVenv(venv) {
+    if (os_1.default.platform() === 'win32') {
+        await (0, exec_1.exec)('powershell', [`${venv}\\Scripts\\activate.ps1`]);
+    }
+    else {
+        await (0, exec_1.exec)('sh', [`source ${venv}/bin/activate`]);
+    }
+}
+exports.activateVenv = activateVenv;
 
 
 /***/ }),
@@ -33851,10 +33889,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const find_1 = __nccwpck_require__(3288);
 const inputs_1 = __nccwpck_require__(7063);
+const venv_1 = __nccwpck_require__(667);
 async function run() {
     try {
         const inputs = (0, inputs_1.getInputs)();
         await (0, find_1.findUv)(inputs);
+        if (inputs.venv) {
+            await (0, venv_1.createVenv)(inputs.venv);
+            await (0, venv_1.activateVenv)(inputs.venv);
+        }
     }
     catch (error) {
         (0, core_1.setFailed)(errorAsMessage(error));

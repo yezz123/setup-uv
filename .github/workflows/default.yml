@@ -50,11 +50,11 @@ jobs:
           uv-version: ${{ matrix.uv-version }}
           uv-venv: "my_virt_env"
       - run: uv --version
-      - name: List files
+      - name: Get python executable
         if: runner.os == 'Windows'
         run: |
-          Get-ChildItem -Force -Path my_virt_env
-      - name: List files
+          where python
+      - name: Get python executable
         if: runner.os != 'Windows'
         run: |
-          ls -la my_virt_env
+          which python

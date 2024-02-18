@@ -31974,7 +31974,7 @@ async function activateVenv(venv) {
         await (0, exec_1.exec)('powershell', [`${venv}\\Scripts\\activate.ps1`]);
     }
     else {
-        await (0, exec_1.exec)('sh', [`source ${venv}/bin/activate`]);
+        await (0, exec_1.exec)('source', [`${venv}/bin/activate`]);
     }
 }
 exports.activateVenv = activateVenv;

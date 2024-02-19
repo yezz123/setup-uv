@@ -48,6 +48,20 @@ steps:
   - uses: yezz123/setup-uv@v1
     with:
       uv-preview: true
+  - run: uv pip install black # this command will run in the uv environment
+```
+
+### Create and activate a virtual environment using uv
+
+```yaml
+steps:
+  - uses: actions/checkout@v3
+  - uses: actions/setup-python@v4
+    with:
+      python-version: "3.11"
+  - uses: yezz123/setup-uv@v1
+    with:
+      uv-venv: "your_venv_name"
   - run: uv --version
 ```
 

@@ -2,16 +2,14 @@ name: default
 on:
   pull_request:
   push:
-    branches:
-      - main
 
 jobs:
   # run linters and unit tests
   lint-and-test-units:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
         id: npm-cache
         with:
           path: ~/.npm
@@ -43,11 +41,22 @@ jobs:
       fail-fast: true
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - uses: ./
         with:
           uv-version: ${{ matrix.uv-version }}
+          uv-venv: "my_virt_env"
       - run: uv --version
+      - name: Get python executable on Windows
+        if: runner.os == 'Windows'
+        run: |
+          Get-Command python
+      - name: Get python executable on non-Windows
+        if: runner.os != 'Windows'
+        run: |
+          which python
+      - name: Check inside virtual environment
+        run: python -c "import sys; exit(0 if sys.prefix != sys.base_prefix else 1)"

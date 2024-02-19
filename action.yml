@@ -9,6 +9,9 @@ inputs:
   uv-version:
     description: uv version to use, if version is not provided then latest stable version will be used
     required: false
+  uv-venv:
+    description: virtual environment name to create and activate.
+    required: false
 runs:
   using: node20
   main: dist/index.js

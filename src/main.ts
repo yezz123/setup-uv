@@ -10,8 +10,6 @@ async function run(): Promise<void> {
     await findUv(inputs)
     if (inputs.venv) {
       await createVenv(inputs.venv)
-      // Debugging only
-      await exec(`ls -lR ${inputs.venv}`)
       await activateVenv(inputs.venv)
     }
   } catch (error) {

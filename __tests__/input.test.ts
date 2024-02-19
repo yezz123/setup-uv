@@ -74,7 +74,7 @@ describe('options', () => {
     expect(getVenvInput('uv-venv')).toBe('my_venv')
   })
 
-  it('getVenvInput returns .venv if input is not provided', () => {
-    expect(getVenvInput('SOMETHING')).toBe('.venv')
+  it('getVenvInput returns null if input is not provided', () => {
+    expect(getVenvInput('SOMETHING')).toBeNull()
   })
 })

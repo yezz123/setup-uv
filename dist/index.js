@@ -31941,10 +31941,10 @@ function getVersionInput(name) {
     return version.trim();
 }
 exports.getVersionInput = getVersionInput;
-function getVenvInput(name, default_ = '.venv') {
+function getVenvInput(name) {
     const venv = (0, core_1.getInput)(name);
     if (!venv) {
-        return default_;
+        return null;
     }
     return venv.trim();
 }
@@ -33894,15 +33894,12 @@ const core_1 = __nccwpck_require__(2186);
 const find_1 = __nccwpck_require__(3288);
 const inputs_1 = __nccwpck_require__(7063);
 const venv_1 = __nccwpck_require__(667);
-const exec_1 = __nccwpck_require__(1514);
 async function run() {
     try {
         const inputs = (0, inputs_1.getInputs)();
         await (0, find_1.findUv)(inputs);
         if (inputs.venv) {
             await (0, venv_1.createVenv)(inputs.venv);
-            // Debugging only
-            await (0, exec_1.exec)(`ls -lR ${inputs.venv}`);
             await (0, venv_1.activateVenv)(inputs.venv);
         }
     }

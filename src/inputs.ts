@@ -43,10 +43,10 @@ export function getVersionInput(name: string): string | null {
   return version.trim()
 }
 
-export function getVenvInput(name: string, default_ = '.venv'): string {
+export function getVenvInput(name: string): string | null {
   const venv = getInput(name)
   if (!venv) {
-    return default_
+    return null
   }
   return venv.trim()
 }

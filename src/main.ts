@@ -2,7 +2,7 @@ import { setFailed } from '@actions/core'
 import { findUv } from './find'
 import { getInputs } from './inputs'
 import { activateVenv, createVenv } from './venv'
-import { exec } from '@actions/exec'
+
 async function run(): Promise<void> {
   try {
     const inputs = getInputs()

@@ -37,20 +37,6 @@ steps:
   - run: uv --version
 ```
 
-### Allow to install prerelease versions of UV
-
-```yaml
-steps:
-  - uses: actions/checkout@v3
-  - uses: actions/setup-python@v4
-    with:
-      python-version: "3.11"
-  - uses: yezz123/setup-uv@v1
-    with:
-      uv-preview: true
-  - run: uv --version
-```
-
 ### Create and activate a virtual environment using uv
 
 ```yaml

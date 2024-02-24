@@ -31906,25 +31906,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getVenvInput = exports.getVersionInput = exports.getBooleanInput = exports.getInputs = void 0;
+exports.getVenvInput = exports.getVersionInput = exports.getInputs = void 0;
 const core_1 = __nccwpck_require__(2186);
 const semver_1 = __importDefault(__nccwpck_require__(1383));
 function getInputs() {
     return {
-        preview: getBooleanInput('uv-preview'),
         version: getVersionInput('uv-version'),
         venv: getVenvInput('uv-venv')
     };
 }
 exports.getInputs = getInputs;
-function getBooleanInput(name, default_ = false) {
-    const value = (0, core_1.getInput)(name);
-    if (!value) {
-        return default_;
-    }
-    return value === 'true';
-}
-exports.getBooleanInput = getBooleanInput;
 function getVersionInput(name) {
     const version = (0, core_1.getInput)(name);
     if (!version) {

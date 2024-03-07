@@ -33900,7 +33900,11 @@ const venv_1 = __nccwpck_require__(667);
 async function run() {
     try {
         const inputs = (0, inputs_1.getInputs)();
-        await (0, find_1.findUv)(inputs);
+        await (0, find_1.findUv)(inputs.version);
+        if (inputs.venv) {
+            await (0, venv_1.createVenv)(inputs.venv);
+            await (0, venv_1.activateVenv)(inputs.venv);
+        }
     }
     catch (error) {
         (0, core_1.setFailed)(errorAsMessage(error));

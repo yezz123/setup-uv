@@ -31858,40 +31858,51 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.findUv = void 0;
 const core_1 = __nccwpck_require__(2186);
 const exec_1 = __nccwpck_require__(1514);
+const io_1 = __nccwpck_require__(7436);
 const tool_cache_1 = __nccwpck_require__(7784);
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const path_1 = __importDefault(__nccwpck_require__(1017));
-const GET_UV_URL_OS = 'https://astral.sh/uv/install.sh';
-const GET_UV_URL_WIN = 'https://astral.sh/uv/install.ps1';
-async function findUv(inputs) {
-    let installScript;
-    if (os_1.default.platform() === 'win32') {
-        installScript = GET_UV_URL_WIN;
-    }
-    else {
-        installScript = GET_UV_URL_OS;
-    }
-    // Download uv installation script
-    const uvInstallPath = await (0, tool_cache_1.downloadTool)(installScript);
-    // Run uv installation script
-    if (os_1.default.platform() === 'win32') {
-        await (0, exec_1.exec)('powershell', [`irm ${installScript} | iex`]);
-    }
-    else {
-        await (0, exec_1.exec)('sh', [uvInstallPath]);
-    }
+const UV_UNIX_LATEST_URL = 'https://astral.sh/uv/install.sh';
+const UV_WIN_LATEST_URL = 'https://astral.sh/uv/install.ps1';
+async function findUv(version) {
+    const installScriptUrl = getInstallScriptUrl(version);
+    const uvInstallPath = await (0, tool_cache_1.downloadTool)(installScriptUrl);
+    await installUv(os_1.default.platform(), uvInstallPath);
     // Add uv executable to the PATH
     const uvPath = path_1.default.join(os_1.default.homedir(), ...getUvPathArgs());
     (0, core_1.addPath)(uvPath);
 }
 exports.findUv = findUv;
-function getUvPathArgs() {
-    switch (os_1.default.platform()) {
-        case 'win32':
-            return ['AppData', 'Roaming', 'uv'];
-        default:
-            return ['.local', 'bin'];
+function getInstallScriptUrl(version) {
+    let installScript;
+    if (os_1.default.platform() === 'win32') {
+        installScript =
+            version == null
+                ? UV_WIN_LATEST_URL
+                : `https://github.com/astral-sh/uv/releases/download/${version}/uv-installer.ps1`;
     }
+    else {
+        installScript =
+            version == null
+                ? UV_UNIX_LATEST_URL
+                : `https://github.com/astral-sh/uv/releases/download/${version}/uv-installer.sh`;
+    }
+    return installScript;
+}
+async function installUv(platform, uvInstallPath) {
+    if (platform === 'win32') {
+        await (0, io_1.mv)(uvInstallPath, uvInstallPath + '.ps1');
+        return await (0, exec_1.exec)('powershell', ['-File', `${uvInstallPath}.ps1`]);
+    }
+    else {
+        return await (0, exec_1.exec)('sh', [uvInstallPath]);
+    }
+}
+function getUvPathArgs() {
+    if (os_1.default.platform() === 'win32') {
+        return ['AppData', 'Roaming', 'uv'];
+    }
+    return ['.local', 'bin'];
 }
 
 
@@ -31919,6 +31930,7 @@ exports.getInputs = getInputs;
 function getVersionInput(name) {
     const version = (0, core_1.getInput)(name);
     if (!version) {
+        (0, core_1.warning)('Using latest version of uv because no version is provided');
         return null;
     }
     const coerced = semver_1.default.coerce(version);
@@ -33889,10 +33901,6 @@ async function run() {
     try {
         const inputs = (0, inputs_1.getInputs)();
         await (0, find_1.findUv)(inputs);
-        if (inputs.venv) {
-            await (0, venv_1.createVenv)(inputs.venv);
-            await (0, venv_1.activateVenv)(inputs.venv);
-        }
     }
     catch (error) {
         (0, core_1.setFailed)(errorAsMessage(error));

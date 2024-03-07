@@ -33,7 +33,7 @@ steps:
       python-version: "3.11"
   - uses: yezz123/setup-uv@v1
     with:
-      uv-version: "0.1.2"
+      uv-version: "0.1.12"
   - run: uv --version
 ```
 

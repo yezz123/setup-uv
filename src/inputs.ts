@@ -1,31 +1,21 @@
-import { getInput } from '@actions/core'
+import { getInput, warning } from '@actions/core'
 import semver from 'semver'
-
 export interface Inputs {
-  // Finder related inputs
-  preview: boolean
   version: string | null
+  venv: string | null
 }
 
 export function getInputs(): Inputs {
   return {
-    preview: getBooleanInput('uv-preview'),
-    version: getVersionInput('uv-version')
+    version: getVersionInput('uv-version'),
+    venv: getVenvInput('uv-venv')
   }
-}
-
-export function getBooleanInput(name: string, default_ = false): boolean {
-  const value = getInput(name)
-  if (!value) {
-    return default_
-  }
-
-  return value === 'true'
 }
 
 export function getVersionInput(name: string): string | null {
   const version = getInput(name)
   if (!version) {
+    warning('Using latest version of uv because no version is provided')
     return null
   }
 
@@ -40,4 +30,12 @@ export function getVersionInput(name: string): string | null {
   }
 
   return version.trim()
+}
+
+export function getVenvInput(name: string): string | null {
+  const venv = getInput(name)
+  if (!venv) {
+    return null
+  }
+  return venv.trim()
 }

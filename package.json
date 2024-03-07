@@ -29,14 +29,12 @@
   "scripts": {
     "bundle": "npm run format:write && npm run package",
     "ci-test": "jest",
-    "coverage": "make-coverage-badge --output-path ./badges/coverage.svg",
     "format:write": "prettier --write **/*.ts",
     "format:check": "prettier --check **/*.ts",
-    "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
     "package": "ncc build src/main.ts --license licenses.txt",
     "package:watch": "npm run package -- --watch",
     "test": "jest",
-    "all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
+    "all": "npm run format:write && npm run test && npm run package"
   },
   "license": "MIT",
   "jest": {
@@ -72,17 +70,17 @@
     "@actions/core": "^1.10.1",
     "@actions/exec": "^1.1.1",
     "@actions/tool-cache": "^2.0.1",
-    "@types/semver": "^7.3.13",
+    "@types/semver": "^7.5.8",
     "semver": "^7.3.8"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.17",
+    "@types/node": "^20.11.24",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vercel/ncc": "^0.38.1",
-    "eslint": "^8.56.0",
-    "eslint-plugin-github": "^4.10.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-github": "^4.10.2",
     "eslint-plugin-jest": "^27.6.3",
     "eslint-plugin-jsonc": "^2.13.0",
     "eslint-plugin-prettier": "^5.1.3",

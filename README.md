@@ -37,7 +37,7 @@ steps:
   - run: uv --version
 ```
 
-### Allow to install prerelease versions of UV
+### Create and activate a virtual environment using uv
 
 ```yaml
 steps:
@@ -47,8 +47,8 @@ steps:
       python-version: "3.11"
   - uses: yezz123/setup-uv@v1
     with:
-      uv-preview: true
-  - run: uv --version
+      uv-venv: "your_venv_name"
+  - run: uv pip install black # this command will run in the uv environment
 ```
 
 ## Contributing

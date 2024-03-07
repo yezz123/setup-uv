@@ -1,4 +1,3 @@
-import { getInput } from '@actions/core'
 import { getInputs, getVenvInput, getVersionInput } from '../src/inputs'
 
 const TEST_ENV_VARS = {

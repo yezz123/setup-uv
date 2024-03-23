@@ -19,7 +19,7 @@ steps:
   - uses: actions/setup-python@v4
     with:
       python-version: "3.11"
-  - uses: yezz123/setup-uv@v1
+  - uses: yezz123/setup-uv@v4
   - run: uv --version
 ```
 
@@ -31,7 +31,7 @@ steps:
   - uses: actions/setup-python@v4
     with:
       python-version: "3.11"
-  - uses: yezz123/setup-uv@v1
+  - uses: yezz123/setup-uv@v4
     with:
       uv-version: "0.1.12"
   - run: uv --version
@@ -45,7 +45,7 @@ steps:
   - uses: actions/setup-python@v4
     with:
       python-version: "3.11"
-  - uses: yezz123/setup-uv@v1
+  - uses: yezz123/setup-uv@v4
     with:
       uv-venv: "your_venv_name"
   - run: uv pip install black # this command will run in the uv environment

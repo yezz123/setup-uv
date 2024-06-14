@@ -1,4 +1,4 @@
-import { getInput, warning } from '@actions/core'
+import { getInput, notice } from '@actions/core'
 import semver from 'semver'
 export interface Inputs {
   version: string | null
@@ -15,7 +15,7 @@ export function getInputs(): Inputs {
 export function getVersionInput(name: string): string | null {
   const version = getInput(name)
   if (!version) {
-    warning('Using latest version of uv because no version is provided')
+    notice('No uv version specified. Using latest version')
     return null
   }
 

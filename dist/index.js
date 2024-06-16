@@ -31930,7 +31930,7 @@ exports.getInputs = getInputs;
 function getVersionInput(name) {
     const version = (0, core_1.getInput)(name);
     if (!version) {
-        (0, core_1.warning)('Using latest version of uv because no version is provided');
+        (0, core_1.notice)('No uv version specified. Using latest version');
         return null;
     }
     const coerced = semver_1.default.coerce(version);

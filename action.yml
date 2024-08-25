@@ -1,20 +1,26 @@
 name: Setup uv
 description: Set up your GitHub Actions workflow with a specific version of uv
 author: Yasser Tahiri
+
 inputs:
   uv-version:
-    description: uv version to use, if version is not provided then latest stable version will be used
+    description: uv version to use. If not provided, the latest stable version will be used.
     required: false
   uv-venv:
-    description: virtual environment name to create and activate.
+    description: Virtual environment name to create and activate.
     required: false
+  uv-cache:
+    description: Whether to cache uv packages. Only supported for uv versions >= 0.3.0.
+    required: false
+    default: 'false'
   uv-cache-dir:
-    description: Directory to use for uv cache. Defaults to /tmp/.uv-cache if not specified.
+    description: Directory to use for uv cache. If not specified, a platform-appropriate default will be used.
     required: false
-    default: /tmp/.uv-cache
+
 runs:
   using: node20
   main: dist/index.js
+
 branding:
   icon: package
   color: purple

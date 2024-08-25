@@ -66724,8 +66724,10 @@ const cache = __importStar(__nccwpck_require__(7799));
 const exec = __importStar(__nccwpck_require__(1514));
 const io = __importStar(__nccwpck_require__(7436));
 const fs = __importStar(__nccwpck_require__(7147));
-const child_process_1 = __nccwpck_require__(2081);
-const UV_CACHE_DIR = process.env.UV_CACHE_DIR || '/tmp/.uv-cache';
+const crypto = __importStar(__nccwpck_require__(6113));
+const path = __importStar(__nccwpck_require__(1017));
+const os = __importStar(__nccwpck_require__(2037));
+const UV_CACHE_DIR = process.env.UV_CACHE_DIR || path.join(os.tmpdir(), '.uv-cache');
 async function setupCache() {
     core.info(`Setting up uv cache directory: ${UV_CACHE_DIR}`);
     await io.mkdirP(UV_CACHE_DIR);
@@ -66772,9 +66774,13 @@ async function minimizeCache() {
     await exec.exec('uv', ['cache', 'prune', '--ci']);
 }
 async function getFileHash(filePath) {
-    return (0, child_process_1.execSync)(`sha256sum ${filePath} | awk '{ print $1 }'`)
-        .toString()
-        .trim();
+    return new Promise((resolve, reject) => {
+        const hash = crypto.createHash('sha256');
+        const stream = fs.createReadStream(filePath);
+        stream.on('error', err => reject(err));
+        stream.on('data', chunk => hash.update(chunk));
+        stream.on('end', () => resolve(hash.digest('hex')));
+    });
 }
 
 
@@ -66853,12 +66859,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getInputs = getInputs;
 exports.getVersionInput = getVersionInput;
 exports.getVenvInput = getVenvInput;
+exports.getCacheInput = getCacheInput;
+exports.isCacheAllowed = isCacheAllowed;
 const core_1 = __nccwpck_require__(2186);
 const semver_1 = __importDefault(__nccwpck_require__(1383));
 function getInputs() {
+    const version = getVersionInput('uv-version');
     return {
-        version: getVersionInput('uv-version'),
-        venv: getVenvInput('uv-venv')
+        version,
+        venv: getVenvInput('uv-venv'),
+        cache: getCacheInput('uv-cache', version)
     };
 }
 function getVersionInput(name) {
@@ -66871,10 +66881,9 @@ function getVersionInput(name) {
     if (!coerced) {
         throw new Error(`Passed uv version '${version}' is not valid`);
     }
-    else if (!semver_1.default.satisfies(coerced, '>=0.1.2')) {
-        throw new Error(`Passed uv version '${coerced}' is not supported. Please use any other supported version >=0.1.2`);
+    else if (!semver_1.default.satisfies(coerced, '>=0.3.0')) {
+        (0, core_1.warning)(`Passed uv version '${coerced}' is less than 0.3.0. Caching will be disabled.`);
     }
-    // Add a warning if a specific version is used
     (0, core_1.warning)(`Using uv version ${version}. This may not be the latest version.`);
     return version.trim();
 }
@@ -66884,6 +66893,28 @@ function getVenvInput(name) {
         return null;
     }
     return venv.trim();
+}
+function getCacheInput(name, version) {
+    const cache = (0, core_1.getInput)(name);
+    const cacheRequested = cache.toLowerCase() === 'true';
+    if (cacheRequested && version) {
+        const coerced = semver_1.default.coerce(version);
+        if (coerced && semver_1.default.satisfies(coerced, '>=0.3.0')) {
+            return true;
+        }
+        else {
+            (0, core_1.warning)('Cache requested but uv version is less than 0.3.0. Caching will be disabled.');
+            return false;
+        }
+    }
+    return cacheRequested && version === null; // Allow caching for 'latest' version
+}
+function isCacheAllowed(version) {
+    if (!version) {
+        return true;
+    }
+    const coerced = semver_1.default.coerce(version);
+    return coerced ? semver_1.default.satisfies(coerced, '>=0.3.0') : false;
 }
 
 
@@ -77898,15 +77929,23 @@ async function run() {
         if (cacheDir) {
             process.env.UV_CACHE_DIR = cacheDir;
         }
-        await (0, cache_1.setupCache)();
-        await (0, cache_1.restoreCache)();
+        const shouldCache = inputs.cache && (0, inputs_1.isCacheAllowed)(inputs.version);
+        if (shouldCache) {
+            await (0, cache_1.setupCache)();
+            await (0, cache_1.restoreCache)();
+        }
+        else if (inputs.cache && !(0, inputs_1.isCacheAllowed)(inputs.version)) {
+            (0, core_1.warning)('Caching is not supported for uv versions below 0.3.0. Skipping cache operations.');
+        }
         await (0, find_1.findUv)(inputs.version);
         if (inputs.venv) {
             await (0, venv_1.createVenv)(inputs.venv);
             await (0, venv_1.activateVenv)(inputs.venv);
         }
-        await (0, cache_1.saveCache)();
-        await (0, cache_1.minimizeCache)();
+        if (shouldCache) {
+            await (0, cache_1.saveCache)();
+            await (0, cache_1.minimizeCache)();
+        }
     }
     catch (error) {
         (0, core_1.setFailed)(errorAsMessage(error));

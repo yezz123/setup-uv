@@ -8,6 +8,10 @@ inputs:
   uv-venv:
     description: virtual environment name to create and activate.
     required: false
+  uv-cache-dir:
+    description: Directory to use for uv cache. Defaults to /tmp/.uv-cache if not specified.
+    required: false
+    default: /tmp/.uv-cache
 runs:
   using: node20
   main: dist/index.js

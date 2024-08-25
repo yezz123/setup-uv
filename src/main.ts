@@ -1,6 +1,6 @@
-import { setFailed, getInput } from '@actions/core'
+import { setFailed, getInput, warning } from '@actions/core'
 import { findUv } from './find'
-import { getInputs } from './inputs'
+import { getInputs, isCacheAllowed } from './inputs'
 import { activateVenv, createVenv } from './venv'
 import { setupCache, restoreCache, saveCache, minimizeCache } from './cache'
 
@@ -13,8 +13,16 @@ async function run(): Promise<void> {
       process.env.UV_CACHE_DIR = cacheDir
     }
 
-    await setupCache()
-    await restoreCache()
+    const shouldCache = inputs.cache && isCacheAllowed(inputs.version)
+
+    if (shouldCache) {
+      await setupCache()
+      await restoreCache()
+    } else if (inputs.cache && !isCacheAllowed(inputs.version)) {
+      warning(
+        'Caching is not supported for uv versions below 0.3.0. Skipping cache operations.'
+      )
+    }
 
     await findUv(inputs.version)
     if (inputs.venv) {
@@ -22,8 +30,10 @@ async function run(): Promise<void> {
       await activateVenv(inputs.venv)
     }
 
-    await saveCache()
-    await minimizeCache()
+    if (shouldCache) {
+      await saveCache()
+      await minimizeCache()
+    }
   } catch (error) {
     setFailed(errorAsMessage(error))
   }

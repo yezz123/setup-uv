@@ -3,9 +3,12 @@ import * as cache from '@actions/cache'
 import * as exec from '@actions/exec'
 import * as io from '@actions/io'
 import * as fs from 'fs'
-import { execSync } from 'child_process'
+import * as crypto from 'crypto'
+import * as path from 'path'
+import * as os from 'os'
 
-const UV_CACHE_DIR = process.env.UV_CACHE_DIR || '/tmp/.uv-cache'
+const UV_CACHE_DIR =
+  process.env.UV_CACHE_DIR || path.join(os.tmpdir(), '.uv-cache')
 
 export async function setupCache(): Promise<void> {
   core.info(`Setting up uv cache directory: ${UV_CACHE_DIR}`)
@@ -60,7 +63,11 @@ export async function minimizeCache(): Promise<void> {
 }
 
 async function getFileHash(filePath: string): Promise<string> {
-  return execSync(`sha256sum ${filePath} | awk '{ print $1 }'`)
-    .toString()
-    .trim()
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256')
+    const stream = fs.createReadStream(filePath)
+    stream.on('error', err => reject(err))
+    stream.on('data', chunk => hash.update(chunk))
+    stream.on('end', () => resolve(hash.digest('hex')))
+  })
 }

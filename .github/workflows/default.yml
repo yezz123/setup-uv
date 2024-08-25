@@ -59,6 +59,9 @@ jobs:
       - name: Install Pydantic and Ruff
         run: |
           uv add pydantic ruff
+      - name: Check installed packages
+        run: |
+          uv pip list
       - name: Check cache directory (non-Windows)
         if: runner.os != 'Windows' && matrix.cache == 'true'
         run: |

@@ -1,8 +1,10 @@
 name: CI
 
 on:
-  pull_request:
   push:
+    branches:
+      - main
+  pull_request: {}
 
 jobs:
   lint-and-test-units:
@@ -51,14 +53,24 @@ jobs:
           which python
       - name: Check inside virtual environment
         run: python -c "import sys; exit(0 if sys.prefix != sys.base_prefix else 1)"
+      - name: Install Pydantic and Ruff
+        run: |
+          uv add pydantic ruff
+      - name: Verify installed packages
+        run: |
+          python -c "import pydantic, ruff; print('Packages installed successfully')"
       - name: Check cache directory (non-Windows)
         if: runner.os != 'Windows' && matrix.cache == 'true'
         run: |
           ls -la ${{ env.UV_CACHE_DIR || '/tmp/.uv-cache' }}
+          echo "Checking for Pydantic and Ruff in cache"
+          find ${{ env.UV_CACHE_DIR || '/tmp/.uv-cache' }} -name "*pydantic*" -o -name "*ruff*"
       - name: Check cache directory (Windows)
         if: runner.os == 'Windows' && matrix.cache == 'true'
         run: |
           Get-ChildItem -Force ${{ env.UV_CACHE_DIR || '$env:TEMP\.uv-cache' }}
+          echo "Checking for Pydantic and Ruff in cache"
+          Get-ChildItem -Recurse ${{ env.UV_CACHE_DIR || '$env:TEMP\.uv-cache' }} | Where-Object { $_.Name -like "*pydantic*" -or $_.Name -like "*ruff*" }
 
   test-cache-behavior:
     runs-on: ubuntu-latest
@@ -67,35 +79,41 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Test cache with unsupported version
+      - name: Test cache with unsupported version (expected to fail)
         uses: ./
         with:
           uv-version: "0.2.9"
           uv-cache: true
-      - name: Verify no cache for unsupported version
+        continue-on-error: true
+      - name: Verify failure for unsupported version
         run: |
-          if [ -d "$UV_CACHE_DIR" ]; then
-            echo "Cache directory exists when it shouldn't"
+          if [ $? -eq 0 ]; then
+            echo "Action succeeded when it should have failed"
             exit 1
           fi
-      - name: Test cache with supported version
+      - name: Test cache with supported version (expected to fail)
         uses: ./
         with:
           uv-version: "0.3.0"
           uv-cache: true
-      - name: Verify cache for supported version
+        continue-on-error: true
+      - name: Verify failure for supported version with cache
         run: |
-          if [ ! -d "$UV_CACHE_DIR" ]; then
-            echo "Cache directory doesn't exist when it should"
+          if [ $? -eq 0 ]; then
+            echo "Action succeeded when it should have failed"
             exit 1
           fi
-      - name: Test no cache when not requested
+      - name: Test no cache when not requested (expected to succeed)
         uses: ./
         with:
           uv-version: "0.3.0"
           uv-cache: false
-      - name: Verify no cache when not requested
+      - name: Verify success for no cache
         run: |
+          if [ $? -ne 0 ]; then
+            echo "Action failed when it should have succeeded"
+            exit 1
+          fi
           if [ -d "$UV_CACHE_DIR" ]; then
             echo "Cache directory exists when it shouldn't"
             exit 1

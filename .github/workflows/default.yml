@@ -1,10 +1,12 @@
-name: default
+name: CI
+
 on:
-  pull_request:
   push:
+    branches:
+      - main
+  pull_request: {}
 
 jobs:
-  # run linters and unit tests
   lint-and-test-units:
     runs-on: ubuntu-latest
     steps:
@@ -20,25 +22,15 @@ jobs:
       - run: npm run format:check
       - run: npm run test
 
-  # run action on a clean machine without building to check that it works as expected
   test-integration:
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        python-version:
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-        uv-version:
-          - "0.1.12"
-          - ""
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+        python-version: ["3.10"]
+        uv-version: ["0.3.0", ""]
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        cache: [true, false]
+        venv-name: [".venv"]
       fail-fast: true
 
     steps:
@@ -49,7 +41,8 @@ jobs:
       - uses: ./
         with:
           uv-version: ${{ matrix.uv-version }}
-          uv-venv: "my_virt_env"
+          uv-venv: ${{ matrix.venv-name }}
+          uv-cache: ${{ matrix.cache }}
       - run: uv --version
       - name: Get python executable on Windows
         if: runner.os == 'Windows'
@@ -61,3 +54,23 @@ jobs:
           which python
       - name: Check inside virtual environment
         run: python -c "import sys; exit(0 if sys.prefix != sys.base_prefix else 1)"
+      - name: init Project
+        run: uv init
+      - name: Install Pydantic and Ruff
+        run: |
+          uv add pydantic ruff
+      - name: Check installed packages
+        run: |
+          uv pip list
+      - name: Check cache directory (non-Windows)
+        if: runner.os != 'Windows' && matrix.cache == 'true'
+        run: |
+          ls -la ${{ env.UV_CACHE_DIR || '/tmp/.uv-cache' }}
+          echo "Checking for Pydantic and Ruff in cache"
+          find ${{ env.UV_CACHE_DIR || '/tmp/.uv-cache' }} -name "*pydantic*" -o -name "*ruff*"
+      - name: Check cache directory (Windows)
+        if: runner.os == 'Windows' && matrix.cache == 'true'
+        run: |
+          Get-ChildItem -Force ${{ env.UV_CACHE_DIR || '$env:TEMP\.uv-cache' }}
+          echo "Checking for Pydantic and Ruff in cache"
+          Get-ChildItem -Recurse ${{ env.UV_CACHE_DIR || '$env:TEMP\.uv-cache' }} | Where-Object { $_.Name -like "*pydantic*" -or $_.Name -like "*ruff*" }

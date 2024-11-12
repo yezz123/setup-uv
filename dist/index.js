@@ -66934,7 +66934,16 @@ exports.activateVenv = activateVenv;
 const exec_1 = __nccwpck_require__(1514);
 const core_1 = __nccwpck_require__(2186);
 const os_1 = __importDefault(__nccwpck_require__(2037));
+const path_1 = __importDefault(__nccwpck_require__(1017));
+const uvBinPath = path_1.default.join(os_1.default.homedir(), '.local', 'bin');
 async function createVenv(venv) {
+    if (os_1.default.platform() === 'win32') {
+        await (0, exec_1.exec)('powershell', [
+            '-Command',
+            `$env:Path = "${uvBinPath};$env:Path"`
+        ]);
+    }
+    (0, core_1.addPath)(uvBinPath);
     await (0, exec_1.exec)('uv', ['venv', venv]);
 }
 async function activateVenv(venv) {

@@ -7,7 +7,10 @@ const uvBinPath = path.join(os.homedir(), '.local', 'bin')
 
 export async function createVenv(venv: string) {
   if (os.platform() === 'win32') {
-    await exec('powershell', ['-Command', `$env:Path = "${uvBinPath};$env:Path"`])
+    await exec('powershell', [
+      '-Command',
+      `$env:Path = "${uvBinPath};$env:Path"`
+    ])
   }
   addPath(uvBinPath)
 
